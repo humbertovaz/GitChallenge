@@ -1,10 +1,12 @@
 package com.github.humbertovaz.gitChallenge.utils;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
 
-@Component
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+
 @ConfigurationProperties("bash")
 public class BashExecutor {
+    private static final Logger logger = LogManager.getLogger();
 
     public static String filename;
 
@@ -29,7 +31,7 @@ public class BashExecutor {
     public boolean executeBashCommand() {
         boolean success = false;
         String cmd = command + ">" + filename;
-        System.out.println("Executing BASH command:\n   " + cmd);
+        logger.info("Executing BASH command:\n   " + cmd);
         Runtime r = Runtime.getRuntime();
         String[] commands = {"bash", "-c", cmd};
         try {
@@ -37,7 +39,7 @@ public class BashExecutor {
             p.waitFor();
             success = true;
         } catch (Exception e) {
-            System.err.println("Failed to execute bash with command: " + cmd);
+            logger.error("Failed to execute bash with command: " + cmd);
             e.printStackTrace();
         }
         return success;
