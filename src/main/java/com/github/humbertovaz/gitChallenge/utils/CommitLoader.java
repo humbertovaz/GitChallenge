@@ -74,7 +74,7 @@ public class CommitLoader {
         try{
             commandSuccess = bashExecutor.executeBashCommand();
             if (!commandSuccess){
-                throw new RuntimeException("Bash command" + bashExecutor.getCommand()); // NPE
+                throw new RuntimeException("Bash command" + bashExecutor.getCommand());
             }
             fstream = new FileInputStream(bashExecutor.getFilename());
             in = new DataInputStream(fstream);

@@ -4,7 +4,7 @@ package com.github.humbertovaz.gitChallenge.controllers;
 import com.github.humbertovaz.gitChallenge.DTO.CommitDTO;
 import com.github.humbertovaz.gitChallenge.events.CustomSpringEventPublisher;
 import com.github.humbertovaz.gitChallenge.events.PaginatedResultsRetrievedEvent;
-import com.github.humbertovaz.gitChallenge.utils.CommitProcessor;
+import com.github.humbertovaz.gitChallenge.services.CommitProcessor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.data.domain.Page;

@@ -1,13 +1,14 @@
-package com.github.humbertovaz.gitChallenge.utils;
+package com.github.humbertovaz.gitChallenge.services;
 
 import com.github.humbertovaz.gitChallenge.DTO.CommitDTO;
+import com.github.humbertovaz.gitChallenge.utils.CommitLoader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
-// TODO: Possibly pass this to services package
+
 public class CommitProcessor {
 
     @Autowired
