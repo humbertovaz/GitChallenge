@@ -30,16 +30,16 @@ public class BashExecutor {
 
     public boolean executeBashCommand() {
         boolean success = false;
-        String cmd = command + ">" + filename;
-        logger.info("Executing BASH command:\n   " + cmd);
+        this.setCommand(command + " > " + filename);
+        logger.info("Executing BASH command:\n   " + command);
         Runtime r = Runtime.getRuntime();
-        String[] commands = {"bash", "-c", cmd};
+        String[] commands = {"bash", "-c", command};
         try {
             Process p = r.exec(commands);
             p.waitFor();
             success = true;
         } catch (Exception e) {
-            logger.error("Failed to execute bash with command: " + cmd);
+            logger.error("Failed to execute bash with command: " + command);
             e.printStackTrace();
         }
         return success;

@@ -8,14 +8,14 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CustomSpringEventPublisher {
+public class ResourceRequestedEventPublisher {
     private static final Logger logger = LogManager.getLogger();
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
 
     public void publishCustomEvent(final PaginatedResultsRetrievedEvent<CommitDTO> paginatedResult) {
         logger.info("Publishing custom event. ");
-        CustomSpringEvent customSpringEvent = new CustomSpringEvent(this, paginatedResult);
-        applicationEventPublisher.publishEvent(customSpringEvent);
+        ResourceRequestedEvent resourceRequestedEvent = new ResourceRequestedEvent(this, paginatedResult);
+        applicationEventPublisher.publishEvent(resourceRequestedEvent);
     }
 }

@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 // TODO: Rename it to CommitBuilder or Create simple DTO
+// TODO: Remove or consider use order (Comparable)
 @Component
 public class CommitDTO implements Comparable<CommitDTO>, Serializable {
     String sha;
