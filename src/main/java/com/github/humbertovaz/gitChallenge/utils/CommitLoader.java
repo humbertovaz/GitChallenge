@@ -10,7 +10,6 @@ import org.springframework.data.domain.Pageable;
 
 import javax.annotation.PostConstruct;
 import java.io.*;
-import java.sql.Time;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.*;
@@ -23,18 +22,23 @@ public class CommitLoader {
     private static int commitsRead = 0;
     private boolean commandSuccess = false;
     private boolean readLineSuccess = false;
-    public String timeout;
+
     ExecutorService bashThreadExecutor = Executors.newSingleThreadExecutor();
     BashExecutor bashExecutor = new BashExecutor();
+
+    public String timeout;
+
+    public DataCluster dataCluster;
 
     public String getTimeout() {
         return timeout;
     }
 
-    public void setTimeout(String timeout) {
-        this.timeout = timeout;
-    }
+    public DataCluster getDataCluster() { return dataCluster; }
 
+    public void setTimeout(String timeout) { this.timeout = timeout; }
+
+    public void setDataCluster(DataCluster dataCluster) { this.dataCluster = dataCluster; }
 
     final Future<Boolean> handler = bashThreadExecutor.submit(new Callable() {
         @Override
@@ -44,9 +48,7 @@ public class CommitLoader {
     });
 
 
-    public List<CommitDTO> getCommits() {
-        return commits;
-    }
+    public List<CommitDTO> getCommits() { return commits; }
 
 
     public static <T> List<T> getPage(List<T> sourceList, int page, int pageSize) {
@@ -76,32 +78,52 @@ public class CommitLoader {
 
     }
 
+    public void init(){
+        FileInputStream fstream;
+        try {
+            File file = new File(BashExecutor.getFilename()); // Create file to avoid NPE
+            if (file.createNewFile()) {
+
+                logger.info("File has been created.");
+            } else {
+                logger.info("File already exists.");
+            }
+            fstream = new FileInputStream(BashExecutor.getFilename());
+            DataInputStream in = new DataInputStream(fstream);
+            BufferedReader br = new BufferedReader(new InputStreamReader(in));
+            this.dataCluster = new DataCluster(in, br);
+        } catch(FileNotFoundException e) {
+            e.printStackTrace();
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     @PostConstruct
-    public void loadCommits() throws IOException {
-
+    public boolean loadCommits() throws IOException {
+        init();
         logger.info("Started to parse commits file");
         this.commits = new ArrayList<>();
-        FileInputStream fstream;
-        DataInputStream in = null;
+        InputStream in = null;
+        BufferedReader br = null;
         try {
             Duration BASH_TIMEOUT = Duration.ofMillis(Integer.parseInt(timeout));
             commandSuccess = handler.get(BASH_TIMEOUT.toMillis(), TimeUnit.MINUTES);
             if (!commandSuccess) {
                 throw new RuntimeException("Bash command" + bashExecutor.getCommand());
             }
-            fstream = new FileInputStream(bashExecutor.getFilename());
-            in = new DataInputStream(fstream);
-            BufferedReader br = new BufferedReader(new InputStreamReader(in));
-            String strLine;
 
+            in = dataCluster.getIn();
+            br = dataCluster.getBr();
+
+            String strLine;
             CommitDTO commitDTO = new CommitDTO();
             while ((strLine = br.readLine()) != null) {
                 logger.info("Line: " + strLine);
                 if (CommitParser.MESSAGE_PATTERN.matcher(strLine).matches()) {
                     // We've reached the last commit info line
                     CommitParser.lineToCommitDTO(strLine, commitDTO);
-                    this.commits.add(commitDTO.build());
+                    this.commits.add(commitDTO);
                     commitDTO = new CommitDTO();
                     CommitLoader.commitsRead++;
                     logger.info("Written in memory " + commitsRead + " commits");
@@ -120,18 +142,18 @@ public class CommitLoader {
             logger.error("Error: " + e.getMessage());
         } finally {
             bashThreadExecutor.shutdownNow();
-            assert in != null;
-            in.close();
+            if(in != null){
+                in.close();
+            }
             File file = new File(bashExecutor.getFilename());
             if (file.delete()) {
                 logger.info("Deleted the file: " + file.getName());
             } else {
-                logger.error("Failed to delete the file.");
+                logger.error("Failed to delete the file: " + file.getName());
             }
+            logger.info("Finished parsing commits");
+            return true;
         }
-        logger.info("Finished parsing commits");
-        return;
-
     }
 
 }

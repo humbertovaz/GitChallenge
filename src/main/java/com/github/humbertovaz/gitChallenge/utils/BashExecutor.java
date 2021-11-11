@@ -24,7 +24,7 @@ public class BashExecutor {
         return command;
     }
 
-    public String getFilename() {
+    public static String getFilename() {
         return filename;
     }
 

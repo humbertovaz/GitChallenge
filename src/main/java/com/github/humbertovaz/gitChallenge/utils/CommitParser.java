@@ -6,8 +6,8 @@ import java.util.regex.Pattern;
 
 public class CommitParser {
 
-    final static Pattern SHA_PATTERN = Pattern.compile("^commit\\s([\\w\\d]+).+$");
-    final static Pattern AUTHOR_PATTERN = Pattern.compile("^Author: ([\\w\\s]+<[\\w\\d]+@[\\w\\d]+\\.\\w+>)$");
+    final static Pattern SHA_PATTERN = Pattern.compile("^commit\\s([\\w\\d]+).*$");
+    final static Pattern AUTHOR_PATTERN = Pattern.compile("^Author: ([\\w\\s]+<[\\w\\d.]+@[\\w\\d]+\\.\\w+>)$");
     final static Pattern DATE_PATTERN = Pattern.compile("^Date:\\s+(.+)$");
     public final static Pattern MESSAGE_PATTERN = Pattern.compile("^\\s{4}(.+)$");
 
