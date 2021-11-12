@@ -26,20 +26,24 @@ public class CommitDTO implements Serializable {
         return author;
     }
 
-    public void setSha(String sha) {
+    public CommitDTO setSha(String sha) {
         this.sha = sha;
+        return this;
     }
 
-    public void setMessage(String message) {
+    public CommitDTO setMessage(String message) {
         this.message = message;
+        return this;
     }
 
-    public void setDate(String date) {
+    public CommitDTO setDate(String date) {
         this.date = date;
+        return this;
     }
 
-    public void setAuthor(String author) {
+    public CommitDTO setAuthor(String author) {
         this.author = author;
+        return this;
     }
 
 }

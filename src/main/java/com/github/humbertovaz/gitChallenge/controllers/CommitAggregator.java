@@ -5,6 +5,8 @@ import com.github.humbertovaz.gitChallenge.DTO.CommitDTO;
 import com.github.humbertovaz.gitChallenge.events.ResourceRequestedEventPublisher;
 import com.github.humbertovaz.gitChallenge.events.PaginatedResultsRetrievedEvent;
 import com.github.humbertovaz.gitChallenge.services.LocalCommitProcessor;
+import com.github.humbertovaz.gitChallenge.services.RemoteCommitProcessor;
+import com.github.humbertovaz.gitChallenge.utils.PagingUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.data.domain.PageImpl;
@@ -24,32 +26,40 @@ public class CommitAggregator {
 
     private static final Logger logger = LogManager.getLogger();
     private final LocalCommitProcessor localCommitProcessor;
+    private final RemoteCommitProcessor remoteCommitProcessor;
     private final ResourceRequestedEventPublisher resourceRequestedEventPublisher;
 
-    public CommitAggregator(LocalCommitProcessor localCommitProcessor, ResourceRequestedEventPublisher resourceRequestedEventPublisher) {
+    public CommitAggregator(LocalCommitProcessor localCommitProcessor,RemoteCommitProcessor remoteCommitProcessor,
+                            ResourceRequestedEventPublisher resourceRequestedEventPublisher) {
         this.localCommitProcessor = localCommitProcessor;
+        this.remoteCommitProcessor = remoteCommitProcessor;
         this.resourceRequestedEventPublisher = resourceRequestedEventPublisher;
     }
-
 
     @GetMapping(path="/commits",params = { "page", "size" })
     public List<CommitDTO> commitsPaginated(
                                      @RequestParam(defaultValue = "1", name = "page") int page,
                                      @RequestParam(defaultValue = "10", name= "size") int size, UriComponentsBuilder uriBuilder,
                                      HttpServletResponse response) {
-        try {
-            Pageable paging = PageRequest.of(page, size);
-            PageImpl<CommitDTO> pageCommits = (PageImpl<CommitDTO>) localCommitProcessor.processCommits(size, page, paging);
-            int totalPages = pageCommits.getTotalPages();
-            if (page > totalPages) {
-                throw new RuntimeException("You've asked a page that doesn't exist");
-            }
-            resourceRequestedEventPublisher.publishCustomEvent(new PaginatedResultsRetrievedEvent<>(
-                    CommitDTO.class, uriBuilder, response, page, totalPages, size));
+        Pageable paging = PageRequest.of(page, size);
+        PageImpl<CommitDTO> pageCommits;
+        try{
+            pageCommits = (PageImpl<CommitDTO>) remoteCommitProcessor.processCommits(size, page, paging);
+            return PagingUtils.pageContent(pageCommits, size, page, resourceRequestedEventPublisher, uriBuilder, response);
+        } catch (Exception e){
+            try {
+                pageCommits = (PageImpl<CommitDTO>) localCommitProcessor.processCommits(size, page, paging);
+                int totalPages = pageCommits.getTotalPages();
+                if (page > totalPages) {
+                    throw new RuntimeException("You've asked a page that doesn't exist");
+                }
+                resourceRequestedEventPublisher.publishCustomEvent(new PaginatedResultsRetrievedEvent<>(
+                        CommitDTO.class, uriBuilder, response, page, totalPages, size));
 
-            return pageCommits.getContent();
-        }catch (Exception e){
-            logger.error(e);
+                return pageCommits.getContent();
+            }catch (Exception e2){
+                logger.error(e2);
+            }
         }
 
         return null;

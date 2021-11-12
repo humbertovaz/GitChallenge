@@ -1,8 +1,6 @@
 package com.github.humbertovaz.gitChallenge.config;
 
-import com.github.humbertovaz.gitChallenge.services.LocalCommitLoader;
-import com.github.humbertovaz.gitChallenge.services.LocalCommitProcessor;
-import com.github.humbertovaz.gitChallenge.services.BashExecutor;
+import com.github.humbertovaz.gitChallenge.services.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
@@ -21,10 +19,21 @@ public class Config {
         return new LocalCommitLoader();
     }
 
-    @Bean("commitProcessor")
+    @Bean("localCommitProcessor")
     @DependsOn("commitLoader")
-    public LocalCommitProcessor commitProcessor(){
+    public LocalCommitProcessor localCommitProcessor(){
         return new LocalCommitProcessor();
     }
+
+    @Bean("remoteCommitProcessor")
+    public RemoteCommitProcessor remoteCommitProcessor(){
+        return new RemoteCommitProcessor();
+    }
+
+    @Bean("remoteCommitLoader")
+    public RemoteCommitLoader remoteCommitLoader(){
+        return new RemoteCommitLoader();
+    }
+
 
 }
