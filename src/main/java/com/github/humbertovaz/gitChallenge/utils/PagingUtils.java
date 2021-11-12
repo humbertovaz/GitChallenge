@@ -1,8 +1,11 @@
-package com.github.humbertovaz.gitChallenge.events.util;
+package com.github.humbertovaz.gitChallenge.utils;
 
 import org.springframework.web.util.UriComponentsBuilder;
 
-public class LinkUtil {
+import java.util.Collections;
+import java.util.List;
+
+public class PagingUtils {
 
     private static String PAGE = "page";
     public static String createLinkHeader(String uri, String rel) {
@@ -28,5 +31,19 @@ public class LinkUtil {
 
     public static boolean hasNextPage(int currentPageNumber, int totalPages){
         return currentPageNumber < totalPages;
+    }
+
+    public static <T> List<T> getPage(List<T> sourceList, int page, int pageSize) {
+        if(pageSize <= 0 || page <= 0) {
+            throw new IllegalArgumentException("Invalid page: " + page + " or Invalid page size: " + pageSize + "\n");
+        }
+
+        int fromIndex = (page - 1) * pageSize;
+        if(sourceList == null || sourceList.size() <= fromIndex){
+            return Collections.emptyList();
+        }
+
+        // toIndex exclusive
+        return sourceList.subList(fromIndex, Math.min(fromIndex + pageSize, sourceList.size()));
     }
 }

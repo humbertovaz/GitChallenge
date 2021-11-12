@@ -1,4 +1,4 @@
-package com.github.humbertovaz.gitChallenge.utils;
+package com.github.humbertovaz.gitChallenge.services;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

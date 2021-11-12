@@ -1,4 +1,4 @@
-package com.github.humbertovaz.gitChallenge.utils;
+package com.github.humbertovaz.gitChallenge.services;
 
 import com.github.humbertovaz.gitChallenge.DTO.CommitDTO;
 import java.util.regex.Matcher;

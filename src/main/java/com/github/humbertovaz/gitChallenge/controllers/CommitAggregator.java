@@ -4,7 +4,7 @@ package com.github.humbertovaz.gitChallenge.controllers;
 import com.github.humbertovaz.gitChallenge.DTO.CommitDTO;
 import com.github.humbertovaz.gitChallenge.events.ResourceRequestedEventPublisher;
 import com.github.humbertovaz.gitChallenge.events.PaginatedResultsRetrievedEvent;
-import com.github.humbertovaz.gitChallenge.services.CommitProcessor;
+import com.github.humbertovaz.gitChallenge.services.LocalCommitProcessor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.data.domain.PageImpl;
@@ -23,11 +23,11 @@ import java.util.List;
 public class CommitAggregator {
 
     private static final Logger logger = LogManager.getLogger();
-    private final CommitProcessor commitProcessor;
+    private final LocalCommitProcessor localCommitProcessor;
     private final ResourceRequestedEventPublisher resourceRequestedEventPublisher;
 
-    public CommitAggregator(CommitProcessor commitProcessor, ResourceRequestedEventPublisher resourceRequestedEventPublisher) {
-        this.commitProcessor = commitProcessor;
+    public CommitAggregator(LocalCommitProcessor localCommitProcessor, ResourceRequestedEventPublisher resourceRequestedEventPublisher) {
+        this.localCommitProcessor = localCommitProcessor;
         this.resourceRequestedEventPublisher = resourceRequestedEventPublisher;
     }
 
@@ -39,7 +39,7 @@ public class CommitAggregator {
                                      HttpServletResponse response) {
         try {
             Pageable paging = PageRequest.of(page, size);
-            PageImpl<CommitDTO> pageCommits = (PageImpl<CommitDTO>) commitProcessor.processCommits(size, page, paging);
+            PageImpl<CommitDTO> pageCommits = (PageImpl<CommitDTO>) localCommitProcessor.processCommits(size, page, paging);
             int totalPages = pageCommits.getTotalPages();
             if (page > totalPages) {
                 throw new RuntimeException("You've asked a page that doesn't exist");

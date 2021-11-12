@@ -1,6 +1,8 @@
-package com.github.humbertovaz.gitChallenge.utils;
+package com.github.humbertovaz.gitChallenge.services;
 
 import com.github.humbertovaz.gitChallenge.DTO.CommitDTO;
+import com.github.humbertovaz.gitChallenge.utils.PagingUtils;
+import com.github.humbertovaz.gitChallenge.utils.DataCluster;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -15,7 +17,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 @ConfigurationProperties("commitloader")
-public class CommitLoader {
+public class LocalCommitLoader {
     private static final Logger logger = LogManager.getLogger();
     private List<CommitDTO> commits;
     private static int lineCounter = 0;
@@ -47,35 +49,15 @@ public class CommitLoader {
         }
     });
 
-
     public List<CommitDTO> getCommits() { return commits; }
 
-
-    public static <T> List<T> getPage(List<T> sourceList, int page, int pageSize) {
-        if(pageSize <= 0 || page <= 0) {
-            throw new IllegalArgumentException("Invalid page: " + page + " or Invalid page size: " + pageSize + "\n");
-        }
-
-        int fromIndex = (page - 1) * pageSize;
-        if(sourceList == null || sourceList.size() <= fromIndex){
-            return Collections.emptyList();
-        }
-
-        // toIndex exclusive
-        return sourceList.subList(fromIndex, Math.min(fromIndex + pageSize, sourceList.size()));
-    }
-
     private Page<CommitDTO> listToPage(List<CommitDTO> fooList, int start, int end, Pageable pageable, int listSize){
-        Page<CommitDTO> page // TODO: Remove unecessary variable
-                = new PageImpl<CommitDTO>(fooList.subList(start, end), pageable, listSize);
-        return page;
+        return new PageImpl<CommitDTO>(fooList.subList(start, end), pageable, listSize);
     }
 
-    public Page<CommitDTO> processCommitsOnPage(int size, int page, Pageable paging) {
-
-        List<CommitDTO> pageList = getPage(commits, page, size);
+    public Page<CommitDTO> processCommits(int size, int page, Pageable paging) {
+        List<CommitDTO> pageList = PagingUtils.getPage(commits, page, size);
         return listToPage(pageList, 0, pageList.size(), paging, commits.size());
-
     }
 
     public void init(){
@@ -125,12 +107,12 @@ public class CommitLoader {
                     CommitParser.lineToCommitDTO(strLine, commitDTO);
                     this.commits.add(commitDTO);
                     commitDTO = new CommitDTO();
-                    CommitLoader.commitsRead++;
+                    LocalCommitLoader.commitsRead++;
                     logger.info("Written in memory " + commitsRead + " commits");
                 } else {
                     readLineSuccess = CommitParser.lineToCommitDTO(strLine, commitDTO) != null;
                     if (readLineSuccess) {
-                        CommitLoader.lineCounter++;
+                        LocalCommitLoader.lineCounter++;
                         logger.info("Read " + lineCounter + " lines");
                     }
                 }

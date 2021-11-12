@@ -1,7 +1,7 @@
 package com.github.humbertovaz.gitChallenge.events;
 
 import com.github.humbertovaz.gitChallenge.DTO.CommitDTO;
-import com.github.humbertovaz.gitChallenge.events.util.LinkUtil;
+import com.github.humbertovaz.gitChallenge.utils.PagingUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.context.ApplicationListener;
@@ -40,11 +40,11 @@ public class ResourceRequestedEventListener implements ApplicationListener<Resou
         headers.add("page", String.valueOf(page));
         headers.add("size", String.valueOf(size));
         UriComponentsBuilder uriComponentsBuilder = paginatedResultsRetrievedEvent.getUriBuilder().path("commits").queryParams(headers);
-        if (LinkUtil.hasNextPage(page, totalPages)) {
-            String uriForNextPage = LinkUtil.constructNextPageUri(uriComponentsBuilder, page, size);
-            linkHeader.add(LinkUtil.createLinkHeader(uriForNextPage, "next"));
+        if (PagingUtils.hasNextPage(page, totalPages)) {
+            String uriForNextPage = PagingUtils.constructNextPageUri(uriComponentsBuilder, page, size);
+            linkHeader.add(PagingUtils.createLinkHeader(uriForNextPage, "next"));
             response.setHeader("next",linkHeader.toString());
         }
-        response.setHeader("location", LinkUtil.constructCurrentPageUri(uriComponentsBuilder, currentPage, size));
+        response.setHeader("location", PagingUtils.constructCurrentPageUri(uriComponentsBuilder, currentPage, size));
     }
 }

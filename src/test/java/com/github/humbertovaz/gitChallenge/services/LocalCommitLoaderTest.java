@@ -1,7 +1,8 @@
-package com.github.humbertovaz.gitChallenge.utils;
+package com.github.humbertovaz.gitChallenge.services;
 
 import com.github.humbertovaz.gitChallenge.DTO.CommitDTO;
 import com.github.humbertovaz.gitChallenge.config.Config;
+import com.github.humbertovaz.gitChallenge.utils.DataCluster;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,10 +20,10 @@ import java.util.List;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @Import(Config.class)
-public class CommitLoaderTest {
+public class LocalCommitLoaderTest {
 
     @Autowired
-    private CommitLoader commitLoader;
+    private LocalCommitLoader localCommitLoader;
 
 
     @Test
@@ -48,11 +49,12 @@ public class CommitLoaderTest {
         InputStream fis = new FileInputStream(fd);
         BufferedReader br = new BufferedReader(new InputStreamReader(fis));
         DataCluster mockDc = new DataCluster(fis, br);
-        commitLoader.setDataCluster(mockDc);
-        Assert.assertTrue(commitLoader.loadCommits());
-        List<CommitDTO> commitDTOList = commitLoader.getCommits();
+        localCommitLoader.setDataCluster(mockDc);
+        Assert.assertTrue(localCommitLoader.loadCommits());
+        List<CommitDTO> commitDTOList = localCommitLoader.getCommits();
         CommitDTO commitA = commitDTOList.get(0);
         CommitDTO commitB = commitDTOList.get(1);
+
         Assert.assertEquals("7c12ee0634ff5bb8f2bd29c289c49a21d1bed874", commitA.getSha());
         Assert.assertEquals("John Doe <johndoe@mail.com>", commitA.getAuthor());
         Assert.assertEquals("Lorem ipsum dolor sit amet, consectetur adipiscing elit", commitA.getMessage());
