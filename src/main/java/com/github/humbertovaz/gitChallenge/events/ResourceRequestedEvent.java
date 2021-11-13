@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 
 public class ResourceRequestedEvent extends ApplicationEvent {
     private PaginatedResultsRetrievedEvent<CommitDTO> paginatedResultsRetrievedEvent;
-    // TODO: Review these fields and its associated methods
+
     private HttpServletResponse response;
     private long idOfCurrentResource;
 

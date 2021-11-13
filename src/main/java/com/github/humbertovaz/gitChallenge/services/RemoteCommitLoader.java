@@ -27,22 +27,39 @@ public class RemoteCommitLoader {
     private List<CommitDTO> commits;
     TimeUnit time = TimeUnit.MILLISECONDS;
 
+    /**
+     * This getter is responsible to expose the externalized endpoint.url string on application.properties
+     */
     public String getUrl() {
         return url;
     }
 
+    /**
+     * This setter is responsible to set the externalized remotecommitloader.url string on application.properties
+     * @param url is a String that is going to be used on external API calls
+     */
     public void setUrl(String url) {
         this.url = url;
     }
 
+    /**
+     * This getter is responsible to expose the externalized remotecommitloader.timeout integer on application.properties
+     */
     public int getTimeout() {
         return timeout;
     }
 
+    /**
+     * This setter is responsible to set the externalized remotecommitloader.timeout string on application.properties
+     * @param timeout is a String that is going to be used on external API calls
+     */
     public void setTimeout(int timeout) {
         this.timeout = timeout;
     }
 
+    /**
+     * This method is responsible to create a GET request, send it and retrieve a StringBuffer with the result
+     */
     private StringBuffer sendGET() throws IOException {
         URL obj = new URL(url);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
@@ -69,11 +86,21 @@ public class RemoteCommitLoader {
 
     }
 
+    /**
+     * This method is responsible for getting commits from remote repository
+     */
     List<CommitDTO> getCommitsFromRepository() throws IOException, JSONException {
         StringBuffer sb = sendGET();
         return RemoteCommitParser.jsonToCommitDTO(sb.toString());
     }
 
+    /**
+     * This method is responsible for processing commits from remote repository based on size, and page number
+     * @param size - size of the page
+     * @param page - page number
+     * @param paging - Pageable object
+     *
+     */
     public Page<CommitDTO> processCommits(int size, int page, Pageable paging) throws IOException, JSONException {
         this.commits = getCommitsFromRepository();
         List<CommitDTO> pageList = PagingUtils.getPage(commits, page, size);

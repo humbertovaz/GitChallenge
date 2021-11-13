@@ -11,11 +11,16 @@ public class DataCluster {
         this.in = in;
         this.br = br;
     }
-
+    /**
+     * This getter is responsible to get InputStream (in) field
+     */
     public InputStream getIn() {
         return in;
     }
 
+    /**
+     * This getter is responsible to get BufferedReader (br) field
+     */
     public BufferedReader getBr() {
         return br;
     }

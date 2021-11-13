@@ -44,7 +44,7 @@ public class LocalCommitLoaderTest {
         fos.write(commitsDump.getBytes(StandardCharsets.UTF_8));
         fos.close();
 
-        File file = new File(fileName); // TODO: Should remove this?
+        File file = new File(fileName);
         FileDescriptor fd = fos.getFD();
         InputStream fis = new FileInputStream(fd);
         BufferedReader br = new BufferedReader(new InputStreamReader(fis));

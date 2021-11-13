@@ -14,6 +14,9 @@ import java.util.List;
 public class RemoteCommitParser {
     private static final Logger logger = LogManager.getLogger();
 
+    /**
+     * This method is responsible to convert a json fomatted list of commits (string) into a List of CommitDTO (List<CommitDTO>)
+     */
     public static List<CommitDTO> jsonToCommitDTO(String jsonString) throws JSONException {
         logger.info("Started parsing commits");
         JSONArray arr = new JSONArray(jsonString);

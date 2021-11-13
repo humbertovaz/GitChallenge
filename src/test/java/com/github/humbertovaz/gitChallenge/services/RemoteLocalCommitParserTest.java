@@ -7,7 +7,7 @@ import org.springframework.boot.configurationprocessor.json.JSONException;
 
 import java.util.List;
 
-public class RemoteCommitParserTest {
+public class RemoteLocalCommitParserTest {
 
     @Test
     public void testJsonCommitDTO(){

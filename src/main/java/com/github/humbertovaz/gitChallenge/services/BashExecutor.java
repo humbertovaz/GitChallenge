@@ -12,22 +12,39 @@ public class BashExecutor {
 
     public static String command;
 
+    /**
+     * This setter is responsible to set the externalized bash.filename string on application.properties
+     * @param filename is a String that is going to be used on bash command
+     */
     public void setFilename(String filename) {
         BashExecutor.filename = filename;
     }
 
+    /**
+     * This setter is responsible to set the externalized bash.command string on application.properties
+     * @param command is a String that is going to be used on bash command
+     */
     public void setCommand(String command) {
         BashExecutor.command = command;
     }
 
+    /**
+     * This getter is responsible to expose the externalized bash.command string on application.properties
+     */
     public String getCommand() {
         return command;
     }
 
+    /**
+     * This getter is responsible to expose the externalized bash.filename string on application.properties
+     */
     public static String getFilename() {
         return filename;
     }
 
+    /**
+     * This method is responsible for executing a local bash command and print its results to a file
+     */
     public boolean executeBashCommand() {
         boolean success = false;
         this.setCommand(command + " > " + filename);

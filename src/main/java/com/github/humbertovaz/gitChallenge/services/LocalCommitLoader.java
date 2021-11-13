@@ -28,42 +28,74 @@ public class LocalCommitLoader {
     ExecutorService bashThreadExecutor = Executors.newSingleThreadExecutor();
     BashExecutor bashExecutor = new BashExecutor();
 
-    public String timeout;
+    public int timeout;
 
     public DataCluster dataCluster;
 
-    public String getTimeout() {
+    /**
+     * This getter is responsible to expose the externalized commitloader.timeout int on application.properties
+     */
+    public int getTimeout() {
         return timeout;
     }
 
-    public DataCluster getDataCluster() { return dataCluster; }
+    /**
+     * This setter is responsible to set the externalized commitloader.timeout string on application.properties
+     * @param timeout is an integer that is going to be used when loading commits to memory
+     */
+    public void setTimeout(int timeout) { this.timeout = timeout; }
 
-    public void setTimeout(String timeout) { this.timeout = timeout; }
-
+    /**
+     * This setter is responsible to set the DataCluster object
+     */
     public void setDataCluster(DataCluster dataCluster) { this.dataCluster = dataCluster; }
 
+    /**
+     * This getter is responsible to get commits field
+     */
+    public List<CommitDTO> getCommits() { return commits; }
+
+
     final Future<Boolean> handler = bashThreadExecutor.submit(new Callable() {
+        /**
+         * This method is responsible to call BashExecutor#executeBashCommand with a timeout
+         */
         @Override
         public Boolean call() throws Exception {
             return bashExecutor.executeBashCommand();
         }
     });
 
-    public List<CommitDTO> getCommits() { return commits; }
-
+    /**
+     * This method is responsible to convert a List<CommitDTO> to Page<CommitDTO>
+     * @param fooList - list of commits
+     * @param start - start of paging
+     * @param end - end of paging
+     * @param pageable - Pageable object
+     * @param listSize - size of the desired list
+     *
+     */
     private Page<CommitDTO> listToPage(List<CommitDTO> fooList, int start, int end, Pageable pageable, int listSize){
         return new PageImpl<CommitDTO>(fooList.subList(start, end), pageable, listSize);
     }
-
+    /**
+     * This method is responsible to process the list that was loaded and return it by pages
+     * @param size - size of the desired list
+     * @param page - desired page
+     * @param paging - Pageable object
+     *
+     */
     public Page<CommitDTO> processCommits(int size, int page, Pageable paging) {
         List<CommitDTO> pageList = PagingUtils.getPage(commits, page, size);
         return listToPage(pageList, 0, pageList.size(), paging, commits.size());
     }
-
+    /**
+     * This method is responsible to initiating the requirements for executing a bash command
+     */
     public void init(){
         FileInputStream fstream;
         try {
-            File file = new File(BashExecutor.getFilename()); // Create file to avoid NPE
+            File file = new File(BashExecutor.getFilename());
             if (file.createNewFile()) {
 
                 logger.info("File has been created.");
@@ -81,6 +113,9 @@ public class LocalCommitLoader {
         }
     }
 
+    /**
+     * This method is responsible for executing a bash command. It is initiated on startup of the application
+     */
     @PostConstruct
     public boolean loadCommits() throws IOException {
         init();
@@ -89,7 +124,7 @@ public class LocalCommitLoader {
         InputStream in = null;
         BufferedReader br = null;
         try {
-            Duration BASH_TIMEOUT = Duration.ofMillis(Integer.parseInt(timeout));
+            Duration BASH_TIMEOUT = Duration.ofMillis(timeout);
             commandSuccess = handler.get(BASH_TIMEOUT.toMillis(), TimeUnit.MINUTES);
             if (!commandSuccess) {
                 throw new RuntimeException("Bash command" + bashExecutor.getCommand());
@@ -102,15 +137,15 @@ public class LocalCommitLoader {
             CommitDTO commitDTO = new CommitDTO();
             while ((strLine = br.readLine()) != null) {
                 logger.info("Line: " + strLine);
-                if (CommitParser.MESSAGE_PATTERN.matcher(strLine).matches()) {
+                if (LocalCommitParser.MESSAGE_PATTERN.matcher(strLine).matches()) {
                     // We've reached the last commit info line
-                    CommitParser.lineToCommitDTO(strLine, commitDTO);
+                    LocalCommitParser.lineToCommitDTO(strLine, commitDTO);
                     this.commits.add(commitDTO);
                     commitDTO = new CommitDTO();
                     LocalCommitLoader.commitsRead++;
                     logger.info("Written in memory " + commitsRead + " commits");
                 } else {
-                    readLineSuccess = CommitParser.lineToCommitDTO(strLine, commitDTO) != null;
+                    readLineSuccess = LocalCommitParser.lineToCommitDTO(strLine, commitDTO) != null;
                     if (readLineSuccess) {
                         LocalCommitLoader.lineCounter++;
                         logger.info("Read " + lineCounter + " lines");
