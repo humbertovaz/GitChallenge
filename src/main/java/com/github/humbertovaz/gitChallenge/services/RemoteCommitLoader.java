@@ -16,14 +16,16 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 
 @ConfigurationProperties("remotecommitloader")
 public class RemoteCommitLoader {
     private static final Logger logger = LogManager.getLogger();
     String url;
-    String timeout;
+    int timeout;
     private List<CommitDTO> commits;
+    TimeUnit time = TimeUnit.MILLISECONDS;
 
     public String getUrl() {
         return url;
@@ -33,11 +35,11 @@ public class RemoteCommitLoader {
         this.url = url;
     }
 
-    public String getTimeout() {
+    public int getTimeout() {
         return timeout;
     }
 
-    public void setTimeout(String timeout) {
+    public void setTimeout(int timeout) {
         this.timeout = timeout;
     }
 
@@ -45,7 +47,7 @@ public class RemoteCommitLoader {
         URL obj = new URL(url);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
         con.setRequestMethod("GET");
-        con.setConnectTimeout(5000); // TODO: Define programmatically number later via properties
+        con.setConnectTimeout((int) time.toMinutes(timeout));
         int responseCode = con.getResponseCode();
         logger.info("GET Response Code :: " + responseCode);
         if (responseCode == HttpURLConnection.HTTP_OK) { // success
