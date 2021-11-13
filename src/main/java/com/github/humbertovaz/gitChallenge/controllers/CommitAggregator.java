@@ -2,12 +2,14 @@ package com.github.humbertovaz.gitChallenge.controllers;
 
 
 import com.github.humbertovaz.gitChallenge.DTO.CommitDTO;
-import com.github.humbertovaz.gitChallenge.events.CustomSpringEventPublisher;
+import com.github.humbertovaz.gitChallenge.events.ResourceRequestedEventPublisher;
 import com.github.humbertovaz.gitChallenge.events.PaginatedResultsRetrievedEvent;
-import com.github.humbertovaz.gitChallenge.services.CommitProcessor;
+import com.github.humbertovaz.gitChallenge.services.LocalCommitProcessor;
+import com.github.humbertovaz.gitChallenge.services.RemoteCommitProcessor;
+import com.github.humbertovaz.gitChallenge.utils.PagingUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,36 +25,41 @@ import java.util.List;
 public class CommitAggregator {
 
     private static final Logger logger = LogManager.getLogger();
-    private final CommitProcessor commitProcessor;
-    private final CustomSpringEventPublisher customSpringEventPublisher;
+    private final LocalCommitProcessor localCommitProcessor;
+    private final RemoteCommitProcessor remoteCommitProcessor;
+    private final ResourceRequestedEventPublisher resourceRequestedEventPublisher;
 
-    public CommitAggregator(CommitProcessor commitProcessor, CustomSpringEventPublisher customSpringEventPublisher) {
-        this.commitProcessor = commitProcessor;
-        this.customSpringEventPublisher = customSpringEventPublisher;
+    public CommitAggregator(LocalCommitProcessor localCommitProcessor,RemoteCommitProcessor remoteCommitProcessor,
+                            ResourceRequestedEventPublisher resourceRequestedEventPublisher) {
+        this.localCommitProcessor = localCommitProcessor;
+        this.remoteCommitProcessor = remoteCommitProcessor;
+        this.resourceRequestedEventPublisher = resourceRequestedEventPublisher;
     }
 
-    @GetMapping(path="/commits")
-    public List<CommitDTO> commits() {
-        return this.commitProcessor.processCommits();
-    }
-
-    @GetMapping(path="/commitsPaginated",params = { "page", "size" })
+    @GetMapping(path="/commits",params = { "page", "size" })
     public List<CommitDTO> commitsPaginated(
-                                     @RequestParam(defaultValue = "0", name = "page") int page,
+                                     @RequestParam(defaultValue = "1", name = "page") int page,
                                      @RequestParam(defaultValue = "10", name= "size") int size, UriComponentsBuilder uriBuilder,
                                      HttpServletResponse response) {
+        Pageable paging = PageRequest.of(page, size);
+        PageImpl<CommitDTO> pageCommits;
         try{
-            Pageable paging = PageRequest.of(page, size);
-            Page<CommitDTO> pageCommits = commitProcessor.processCommits(size, page, paging);
-            if (page > pageCommits.getTotalPages()) {
-                throw new RuntimeException("You've asked a page that doesn't exist");
-            }
-            customSpringEventPublisher.publishCustomEvent(new PaginatedResultsRetrievedEvent<>(
-                    CommitDTO.class, uriBuilder, response, page, pageCommits.getTotalPages(), size));
+            pageCommits = (PageImpl<CommitDTO>) remoteCommitProcessor.processCommits(size, page, paging);
+            return PagingUtils.pageContent(pageCommits, size, page, resourceRequestedEventPublisher, uriBuilder, response);
+        } catch (Exception e){
+            try {
+                pageCommits = (PageImpl<CommitDTO>) localCommitProcessor.processCommits(size, page, paging);
+                int totalPages = pageCommits.getTotalPages();
+                if (page > totalPages) {
+                    throw new RuntimeException("You've asked a page that doesn't exist");
+                }
+                resourceRequestedEventPublisher.publishCustomEvent(new PaginatedResultsRetrievedEvent<>(
+                        CommitDTO.class, uriBuilder, response, page, totalPages, size));
 
-            return pageCommits.getContent();
-        }catch (Exception e){
-            logger.error(e);
+                return pageCommits.getContent();
+            }catch (Exception e2){
+                logger.error(e2);
+            }
         }
 
         return null;
