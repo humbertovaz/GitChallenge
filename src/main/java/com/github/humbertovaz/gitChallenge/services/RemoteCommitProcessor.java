@@ -2,7 +2,6 @@ package com.github.humbertovaz.gitChallenge.services;
 
 import com.github.humbertovaz.gitChallenge.DTO.CommitDTO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import java.io.IOException;
@@ -25,7 +24,7 @@ public class RemoteCommitProcessor {
      * @param page - desired page
      * @param paging - Pageable object
      */
-    public Page<CommitDTO> processCommits(int size, int page, Pageable paging) throws IOException, JSONException {
+    public Page<CommitDTO> processCommits(int size, int page, Pageable paging) throws IOException, org.json.JSONException {
         return remoteCommitLoader.processCommits(size, page, paging);
     }
 }

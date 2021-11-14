@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.github.humbertovaz</groupId>
 	<artifactId>gitChallenge</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<name>gitChallenge</name>
 	<description>Git Challenge</description>
 	<properties>
@@ -62,7 +62,14 @@
 			<scope>test</scope>
 		</dependency>
 
-    </dependencies>
+		<dependency>
+			<groupId>com.vaadin.external.google</groupId>
+			<artifactId>android-json</artifactId>
+			<version>0.0.20131108.vaadin1</version>
+			<scope>compile</scope>
+		</dependency>
+
+	</dependencies>
 
 	<build>
 		<plugins>

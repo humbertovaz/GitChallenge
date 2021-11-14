@@ -25,15 +25,15 @@ public class Config {
         return new LocalCommitProcessor();
     }
 
-    @Bean("remoteCommitProcessor")
-    public RemoteCommitProcessor remoteCommitProcessor(){
-        return new RemoteCommitProcessor();
-    }
-
     @Bean("remoteCommitLoader")
+    @DependsOn("commitDTO")
     public RemoteCommitLoader remoteCommitLoader(){
         return new RemoteCommitLoader();
     }
 
-
+    @Bean("remoteCommitProcessor")
+    @DependsOn("remoteCommitLoader")
+    public RemoteCommitProcessor remoteCommitProcessor(){
+        return new RemoteCommitProcessor();
+    }
 }

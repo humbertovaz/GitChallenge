@@ -3,9 +3,9 @@ package com.github.humbertovaz.gitChallenge.services;
 import com.github.humbertovaz.gitChallenge.DTO.CommitDTO;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.boot.configurationprocessor.json.JSONArray;
-import org.springframework.boot.configurationprocessor.json.JSONException;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 
 import java.util.ArrayList;
