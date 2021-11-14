@@ -1,6 +1,6 @@
-# GitChallenge
+# Git Challenge
 
-## Pre-requisites
+## Environment Requirements
 
 - Java 11
 - Maven
