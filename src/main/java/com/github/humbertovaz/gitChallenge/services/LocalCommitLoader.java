@@ -140,10 +140,15 @@ public class LocalCommitLoader {
                 if (LocalCommitParser.MESSAGE_PATTERN.matcher(strLine).matches()) {
                     // We've reached the last commit info line
                     LocalCommitParser.lineToCommitDTO(strLine, commitDTO);
-                    this.commits.add(commitDTO);
-                    commitDTO = new CommitDTO();
-                    LocalCommitLoader.commitsRead++;
-                    logger.info("Written in memory " + commitsRead + " commits");
+                    br.mark(9999);
+                    String nextLine = br.readLine();
+                    br.reset();
+                    if(nextLine== null || LocalCommitParser.SHA_PATTERN.matcher(nextLine).matches() || nextLine.equals("")){
+                        this.commits.add(commitDTO);
+                        commitDTO = new CommitDTO();
+                        LocalCommitLoader.commitsRead++;
+                        logger.info("Written in memory " + commitsRead + " commits");
+                    }
                 } else {
                     readLineSuccess = LocalCommitParser.lineToCommitDTO(strLine, commitDTO) != null;
                     if (readLineSuccess) {
