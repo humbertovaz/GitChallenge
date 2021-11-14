@@ -3,7 +3,6 @@ package com.github.humbertovaz.gitChallenge.services;
 import com.github.humbertovaz.gitChallenge.DTO.CommitDTO;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.configurationprocessor.json.JSONException;
 
 import java.util.List;
 
@@ -100,7 +99,7 @@ public class RemoteLocalCommitParserTest {
             Assert.assertEquals(firstCommit.getAuthor(),"John Doe <John.Doe@mail.com>");
             Assert.assertEquals(firstCommit.getMessage(),"Create README.md");
 
-        } catch (JSONException e) {
+        } catch (org.json.JSONException e) {
             e.printStackTrace();
         }
     }

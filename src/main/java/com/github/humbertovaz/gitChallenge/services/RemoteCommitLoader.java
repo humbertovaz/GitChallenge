@@ -5,7 +5,6 @@ import com.github.humbertovaz.gitChallenge.DTO.CommitDTO;
 import com.github.humbertovaz.gitChallenge.utils.PagingUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -89,7 +88,7 @@ public class RemoteCommitLoader {
     /**
      * This method is responsible for getting commits from remote repository
      */
-    List<CommitDTO> getCommitsFromRepository() throws IOException, JSONException {
+    List<CommitDTO> getCommitsFromRepository() throws IOException, org.json.JSONException {
         StringBuffer sb = sendGET();
         return RemoteCommitParser.jsonToCommitDTO(sb.toString());
     }
@@ -101,7 +100,7 @@ public class RemoteCommitLoader {
      * @param paging - Pageable object
      *
      */
-    public Page<CommitDTO> processCommits(int size, int page, Pageable paging) throws IOException, JSONException {
+    public Page<CommitDTO> processCommits(int size, int page, Pageable paging) throws IOException, org.json.JSONException {
         this.commits = getCommitsFromRepository();
         List<CommitDTO> pageList = PagingUtils.getPage(commits, page, size);
         return PagingUtils.listToPage(pageList, 0, pageList.size(), paging, commits.size());

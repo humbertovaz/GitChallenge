@@ -37,7 +37,13 @@ public class LocalCommitParser {
             commitDTO.setDate(dateMatcher.group(1));
             return commitDTO;
         } else if (isMessage){
-            commitDTO.setMessage(messageMatcher.group(1));
+            String oldMsg = commitDTO.getMessage();
+            if(oldMsg!= null){
+                commitDTO.setMessage(oldMsg + "\n" + messageMatcher.group(1));
+            } else {
+                commitDTO.setMessage(messageMatcher.group(1));
+            }
+
             return commitDTO;
         }
         return null;
