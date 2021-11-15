@@ -8,9 +8,15 @@
 ``mvn clean install &&  mvn spring-boot:run``
 
 ## Purpose of the project
-This project aims to collect and parse commits from remote github repository defined in application.properties file (remotecommitloader.url)
 
-It is scattered in different components based on domain.
+This project aims to collect and parse commits from remote github repository defined in application.properties file (remotecommitloader.url).
+If for some reason we can't get the commits from the remote github repository it will fallback to local git cli.
+
+I decided to implement some classes in a more generic way to give more flexibility. 
+While this may be overkill in the context of this small project, I wanted to explore a solution that is more robust and 
+flexible for the future in terms of maintenance preserving the readability.
+Generally, it is scattered in different components/classes based on domain.
+
 
 ### CommitAggregator class
     
