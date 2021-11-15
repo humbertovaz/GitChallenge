@@ -1,9 +1,12 @@
 # Git Challenge
 
+
 ## Environment Requirements
+
 
 - Java 11
 - Maven
+
 ## How to run it
 ``mvn clean install &&  mvn spring-boot:run``
 
