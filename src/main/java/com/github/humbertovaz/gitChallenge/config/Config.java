@@ -13,20 +13,19 @@ public class Config {
         return new BashExecutor();
     }
 
-    @Bean("commitLoader")
+    @Bean("localCommitLoader")
     @DependsOn("bashExecutor")
-    public LocalCommitLoader commitLoader(){
+    public LocalCommitLoader localCommitLoader(){
         return new LocalCommitLoader();
     }
 
     @Bean("localCommitProcessor")
-    @DependsOn("commitLoader")
+    @DependsOn("localCommitLoader")
     public LocalCommitProcessor localCommitProcessor(){
         return new LocalCommitProcessor();
     }
 
     @Bean("remoteCommitLoader")
-    @DependsOn("commitDTO")
     public RemoteCommitLoader remoteCommitLoader(){
         return new RemoteCommitLoader();
     }
